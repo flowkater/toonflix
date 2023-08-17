@@ -16,7 +16,7 @@ class App extends StatelessWidget {
           ),
         ),
         colorScheme: theme.colorScheme.copyWith(
-          background: const Color(0xFFE7626C),
+          background: const Color(0xFFE64D3D),
         ),
       ),
       home: const HomeScreen(),

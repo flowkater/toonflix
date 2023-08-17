@@ -16,10 +16,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const twentyFiveMinutes = 1500;
-  int totalSeconds = twentyFiveMinutes;
+  static const timeRange = [15 * 60, 20 * 60, 25 * 60, 30 * 60, 35 * 60];
+  int timeRangeIndex = 2;
   bool isRunning = false;
   int totalPomodoros = 0;
+  late int totalSeconds = timeRange[timeRangeIndex];
   late Timer timer;
 
   void onTick(Timer timer) {
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         totalPomodoros = totalPomodoros + 1;
         isRunning = false;
-        totalSeconds = twentyFiveMinutes;
+        totalSeconds = timeRange[timeRangeIndex];
       });
       timer.cancel();
     } else {
@@ -56,6 +57,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void onResetPressed() {
+    timer.cancel();
+
+    setState(() {
+      isRunning = false;
+      totalSeconds = timeRange[timeRangeIndex];
+    });
+  }
+
+  void onSelectedTimeRange(int index) {
+    timer.cancel();
+
+    setState(() {
+      timeRangeIndex = index;
+      totalSeconds = timeRange[timeRangeIndex];
+    });
+  }
+
   String format(int seconds) {
     final duration = Duration(seconds: seconds);
     return duration.toString().split(".").first.substring(2, 7);
@@ -69,6 +88,23 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Flexible(
             flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'POMOTIMER',
+                  style: TextStyle(
+                    color: Theme.of(context).cardColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
@@ -78,6 +114,49 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 89,
                   fontWeight: FontWeight.w600,
                 ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: SizedBox(
+              height: 40,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: timeRange.length,
+                itemBuilder: ((context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: GestureDetector(
+                      onTap: () => onSelectedTimeRange(index),
+                      child: Container(
+                        width: 60,
+                        decoration: BoxDecoration(
+                          color: index == timeRangeIndex
+                              ? Theme.of(context).cardColor
+                              : null,
+                          border: Border.all(
+                            color: Theme.of(context).cardColor,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${timeRange[index] ~/ 60}',
+                            style: TextStyle(
+                              color: index == timeRangeIndex
+                                  ? Theme.of(context).colorScheme.background
+                                  : Theme.of(context).cardColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
               ),
             ),
           ),
