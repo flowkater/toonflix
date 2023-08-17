@@ -2,11 +2,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 // Requirements
-// - 유저가 타이머의 시간(15, 20, 25, 30, 35)을 선택할 수 있어야 합니다.
-// - 유저가 타이머를 재설정 (리셋)할 수 있어야 합니다.
-// - 유저가 한 사이클을 완료한 횟수를 카운트해야 합니다.
-// - 유저가 4개의 사이클(1라운드)를 완료한 횟수를 카운트해야 합니다.
-// - 각 라운드가 끝나면 사용자가 5분간 휴식을 취할 수 있어야 합니다.
+// - [x] 유저가 타이머의 시간(15, 20, 25, 30, 35)을 선택할 수 있어야 합니다.
+// - [ ] 유저가 타이머를 재설정 (리셋)할 수 있어야 합니다.
+// - [ ] 유저가 한 사이클을 완료한 횟수를 카운트해야 합니다.
+// - [ ] 유저가 4개의 사이클(1라운드)를 완료한 횟수를 카운트해야 합니다.
+// - [ ] 각 라운드가 끝나면 사용자가 5분간 휴식을 취할 수 있어야 합니다.
+
+// Design
+// - [x] POMOTIMER
+// - [ ] Timer
+// - [x] Selection Time
+// - [ ] Pause Button
+// - [ ] Reset Button
+// - [ ] Bottom
+// - [ ] Layout detail
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,11 +26,28 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   static const timeRange = [15 * 60, 20 * 60, 25 * 60, 30 * 60, 35 * 60];
+  double currentTimeRangeIndex = 2;
+
   int timeRangeIndex = 2;
   bool isRunning = false;
   int totalPomodoros = 0;
   late int totalSeconds = timeRange[timeRangeIndex];
   late Timer timer;
+
+  final pageController = PageController(
+    initialPage: 2,
+    viewportFraction: 0.2,
+  );
+
+  @override
+  void initState() {
+    pageController.addListener(() {
+      setState(() {
+        currentTimeRangeIndex = pageController.page!;
+      });
+    });
+    super.initState();
+  }
 
   void onTick(Timer timer) {
     if (totalSeconds == 0) {
@@ -67,12 +93,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onSelectedTimeRange(int index) {
-    timer.cancel();
+    if (isRunning) timer.cancel();
 
     setState(() {
       timeRangeIndex = index;
       totalSeconds = timeRange[timeRangeIndex];
     });
+
+    pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   String format(int seconds) {
@@ -89,7 +121,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Flexible(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+              ),
               child: Container(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -104,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Flexible(
-            flex: 1,
+            flex: 2,
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
@@ -120,36 +154,43 @@ class _HomeScreenState extends State<HomeScreen> {
           Flexible(
             flex: 1,
             child: SizedBox(
-              height: 40,
-              child: ListView.builder(
+              height: 45,
+              child: PageView.builder(
+                controller: pageController,
                 scrollDirection: Axis.horizontal,
                 itemCount: timeRange.length,
                 itemBuilder: ((context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: GestureDetector(
-                      onTap: () => onSelectedTimeRange(index),
-                      child: Container(
-                        width: 60,
-                        decoration: BoxDecoration(
-                          color: index == timeRangeIndex
-                              ? Theme.of(context).cardColor
-                              : null,
-                          border: Border.all(
-                            color: Theme.of(context).cardColor,
-                            width: 2,
+                  final double diff = (index - currentTimeRangeIndex).abs();
+                  final double halfLength = timeRange.length / 2;
+                  final double opacity = 1 - (diff / halfLength).clamp(0, 1);
+
+                  return Opacity(
+                    opacity: opacity,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: GestureDetector(
+                        onTap: () => onSelectedTimeRange(index),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: index == timeRangeIndex
+                                ? Theme.of(context).cardColor
+                                : null,
+                            border: Border.all(
+                              color: Theme.of(context).cardColor,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
                           ),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${timeRange[index] ~/ 60}',
-                            style: TextStyle(
-                              color: index == timeRangeIndex
-                                  ? Theme.of(context).colorScheme.background
-                                  : Theme.of(context).cardColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
+                          child: Center(
+                            child: Text(
+                              '${timeRange[index] ~/ 60}',
+                              style: TextStyle(
+                                color: index == timeRangeIndex
+                                    ? Theme.of(context).colorScheme.background
+                                    : Theme.of(context).cardColor,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
