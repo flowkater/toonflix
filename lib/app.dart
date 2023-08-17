@@ -9,6 +9,7 @@ class App extends StatelessWidget {
     final theme = ThemeData();
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         textTheme: const TextTheme(
           displayLarge: TextStyle(
