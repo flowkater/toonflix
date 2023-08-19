@@ -15,7 +15,7 @@ class App extends StatelessWidget {
           background: Colors.white,
         ),
       ),
-      home: const HomeScreen(),
+      home: HomeScreen(),
     );
   }
 }
