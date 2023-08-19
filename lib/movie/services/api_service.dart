@@ -10,7 +10,6 @@ const String comingSoon = "coming-soon";
 
 class ApiService {
   static const String baseUrl = "https://movies-api.nomadcoders.workers.dev";
-
   static const String detail = "movie";
 
   static Future<List<MovieModel>> getMovies({String type = "popular"}) async {
