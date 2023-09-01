@@ -7,7 +7,7 @@ import 'package:toonflix/movie/widget/movie_listview.dart';
 // - [x] 가장 인기 있는 영화 목록이 표시되어야 합니다.
 // - [x] 극장에서 상영 중인 영화 목록이 표시되어야 합니다.
 // - [x] 곧 개봉할 영화 목록이 표시되어야 합니다.
-// - [ ] movie를 탭하면 세부정보 화면으로 이동해야 합니다.
+// - [x] movie를 탭하면 세부정보 화면으로 이동해야 합니다.
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
